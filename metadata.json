@@ -1,0 +1,6 @@
+{
+  "name": "KasaPOS",
+  "description": "Application de gestion de commerce, ventes, dépenses, profit en temps réel, stock avec alertes, dettes clients et bidevise FC/USD avec synchronisation cloud.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

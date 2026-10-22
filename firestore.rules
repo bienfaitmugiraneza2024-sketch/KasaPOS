@@ -1,0 +1,92 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    match /users/{userId} {
+      allow get, list: if isOwner(userId);
+
+      // Core products, sales, expenses, settings
+      match /products/{productId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /sales/{saleId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /expenses/{expenseId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /customers/{customerId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /debt_payments/{paymentId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /settings/{settingId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Multi-store and employee management
+      match /stores/{storeId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /invite_codes/{codeId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /staff/{staffId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /cash_closings/{closingId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /stock_transfers/{transferId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /stock_losses/{lossId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /detailed_debts/{debtId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /provisions/{provisionId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /requisitions/{requisitionId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+  }
+}

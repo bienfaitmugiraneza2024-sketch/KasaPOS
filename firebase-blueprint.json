@@ -1,0 +1,123 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "Article en stock pour le commerce de détail",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Nom de l'article" },
+        "category": { "type": "string", "description": "Catégorie du produit" },
+        "barcode": { "type": "string", "description": "Code barre ou référence optionnelle" },
+        "purchasePriceUSD": { "type": "number", "description": "Prix d'achat unitaire en USD" },
+        "sellingPriceUSD": { "type": "number", "description": "Prix de vente unitaire en USD" },
+        "stockQuantity": { "type": "number", "description": "Quantité en stock disponible" },
+        "minStockAlert": { "type": "number", "description": "Seuil d'alerte de stock critique minimum" },
+        "unit": { "type": "string", "description": "Unité de mesure (pcs, kg, carton, etc.)" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "purchasePriceUSD", "sellingPriceUSD", "stockQuantity", "minStockAlert"]
+    },
+    "Sale": {
+      "title": "Sale",
+      "description": "Transaction de vente enregistrée",
+      "type": "object",
+      "properties": {
+        "items": { "type": "array", "description": "Articles vendus dans le panier" },
+        "totalUSD": { "type": "number", "description": "Montant total de la vente en USD" },
+        "totalFC": { "type": "number", "description": "Montant total équivalent en Franc Congolais" },
+        "currencyUsed": { "type": "string", "enum": ["USD", "FC"], "description": "Devise réglée à la caisse" },
+        "exchangeRate": { "type": "number", "description": "Taux de change appliqué (1 USD = X FC)" },
+        "grossProfitUSD": { "type": "number", "description": "Bénéfice brut calculé en temps réel" },
+        "customerId": { "type": "string", "description": "ID client si vente à crédit ou rattachée" },
+        "customerName": { "type": "string", "description": "Nom du client pour affichage rapide" },
+        "paymentType": { "type": "string", "enum": ["CASH", "DEBT"], "description": "Type de paiement" },
+        "isPaid": { "type": "boolean", "description": "Statut de paiement de la vente" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["items", "totalUSD", "totalFC", "currencyUsed", "exchangeRate", "grossProfitUSD", "paymentType", "isPaid"]
+    },
+    "Expense": {
+      "title": "Expense",
+      "description": "Dépense ou charge d'exploitation",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Motif de la dépense" },
+        "category": { "type": "string", "description": "Catégorie de la dépense (Loyer, Transport, Électricité, etc.)" },
+        "amountUSD": { "type": "number", "description": "Montant en USD" },
+        "amountFC": { "type": "number", "description": "Montant équivalent en FC" },
+        "currencyUsed": { "type": "string", "enum": ["USD", "FC"] },
+        "notes": { "type": "string", "description": "Notes explicatives optionnelles" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "category", "amountUSD", "amountFC", "currencyUsed"]
+    },
+    "Customer": {
+      "title": "Customer",
+      "description": "Fiche client et registre de dette",
+      "type": "object",
+      "properties": {
+        "fullName": { "type": "string", "description": "Nom complet du client" },
+        "phone": { "type": "string", "description": "Numéro de téléphone pour rappels" },
+        "totalDebtUSD": { "type": "number", "description": "Solde débiteur restant dû en USD" },
+        "totalDebtFC": { "type": "number", "description": "Solde débiteur restant dû en FC" },
+        "notes": { "type": "string", "description": "Notes sur le client" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["fullName", "totalDebtUSD", "totalDebtFC"]
+    },
+    "DebtPayment": {
+      "title": "DebtPayment",
+      "description": "Règlement ou remboursement d'une dette client",
+      "type": "object",
+      "properties": {
+        "customerId": { "type": "string", "description": "ID du client remboursant" },
+        "amountUSD": { "type": "number", "description": "Montant remboursé en USD" },
+        "amountFC": { "type": "number", "description": "Montant remboursé en FC" },
+        "exchangeRate": { "type": "number", "description": "Taux de change appliqué" },
+        "notes": { "type": "string", "description": "Notes du reçu" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["customerId", "amountUSD", "amountFC"]
+    },
+    "UserSettings": {
+      "title": "UserSettings",
+      "description": "Paramètres de la boutique et devises",
+      "type": "object",
+      "properties": {
+        "shopName": { "type": "string", "description": "Nom de la boutique ou établissement" },
+        "exchangeRate": { "type": "number", "description": "Taux de change actuel (ex: 2850 FC pour 1 USD)" },
+        "primaryCurrency": { "type": "string", "enum": ["USD", "FC"], "description": "Devise préférée d'affichage" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["shopName", "exchangeRate", "primaryCurrency"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/products/{productId}": {
+      "schema": "Product",
+      "description": "Inventaire des produits du commerçant"
+    },
+    "/users/{userId}/sales/{saleId}": {
+      "schema": "Sale",
+      "description": "Historique des ventes du commerçant"
+    },
+    "/users/{userId}/expenses/{expenseId}": {
+      "schema": "Expense",
+      "description": "Dépenses d'exploitation du commerçant"
+    },
+    "/users/{userId}/customers/{customerId}": {
+      "schema": "Customer",
+      "description": "Clients et suivi des crédits"
+    },
+    "/users/{userId}/debt_payments/{paymentId}": {
+      "schema": "DebtPayment",
+      "description": "Paiements et remboursements de dettes"
+    },
+    "/users/{userId}/settings/{settingId}": {
+      "schema": "UserSettings",
+      "description": "Préférences et configuration de devises"
+    }
+  }
+}
